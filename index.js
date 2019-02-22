@@ -31,6 +31,25 @@ server.post('/projects', async (req, res) => {
 });
 
 
+
+//POSTS a new action to the correct project
+server.post('/actions', async (req, res) => {
+    if (req.body.project_id == "" || req.body.description == "" || req.body.notes == "" ||
+    req.body.project_id == null || req.body.description == null || req.body.notes == null) {
+        res.status(400).json({message: "Please provide information for all of the fields."})
+    } else {
+        try {
+            const newAction = await db('actions')
+            .insert(req.body);
+            res.status(201).json(newAction)
+        } catch (error) {
+            res.status(500).json({message: "Error while adding message."});
+        }
+    }
+});
+
+
+
 //GETS a project using its id and returns the project with its actions
 server.get('/projects/:id/actions', async (req, res) => {
     try {
