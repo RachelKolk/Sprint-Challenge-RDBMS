@@ -13,7 +13,22 @@ const server = express();
 server.use(helmet());
 server.use(express.json());
 
+//POSTS a new project to the projects table
+server.post('/projects', async (req, res) => {
+    try {
+        if (req.body.name == "" || req.body.name == null) {
+            res.status(406).json({message: "Please provide a project name"});
+        } else {
+            const [id] = await db('projects')
+            .insert(req.body);
 
+            res.status(201).json(id);
+        }
+
+    } catch (error) {
+        res.status(500).json({error: "An error occurred while adding the project."});
+    }
+});
 
 
 //GETS a project using its id and returns the project with its actions
