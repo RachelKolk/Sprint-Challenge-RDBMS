@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const knex = require('knex');
 const knexConfig = require('./knexfile.js');
 
+const NestHydrationJS = require('nesthydrationjs')();
 
 const db = knex(knexConfig.development);
 
@@ -26,7 +27,7 @@ server.post('/projects', async (req, res) => {
         }
 
     } catch (error) {
-        res.status(500).json({error: "An error occurred while adding the project."});
+        res.status(500).json(error);
     }
 });
 
@@ -55,19 +56,38 @@ server.get('/projects/:id/actions', async (req, res) => {
     try {
         const id = req.params.id
 
-        const entireProject = await db('actions as a')
-        .join('projects as p', 'p.id', 'a.project_id')
-        .select('p.id', 'p.name', 'p.description', 'p.completed', 'a.id', 'a.description', 'a.notes', 'a.completed')
+    
+        const entireProject = await db('projects as p')
+        .join('actions as a', 'p.id', 'a.project_id')
+        
+        .select('p.id as _id___NUMBER', 'p.name as _name', 'p.description as _description', 'p.completed as _completed', 
+        'a.id as _action_id___NUMBER', 'a.description as _action_name', 'a.notes as _action_notes', 'a.completed as _action_completed')
+        
         .where('a.project_id', id);
+        result = NestHydrationJS.nest(entireProject);
+
+    
 
         if (entireProject.length > 0) {
-            res.status(200).json(entireProject)
+            res.status(200).json(result)
         } else {
             res.status(404).json({message: "That project doesn't exist"});
         }
 
     } catch  (error) {
-        res.status(500).json({error: "AN error occurred during data retrieval."});
+        res.status(500).json({message: "An error occured."});
+    }
+});
+
+
+
+//GETS all projects
+server.get('/projects', async (req, res) => {
+    try {
+        const projects = await db('projects');
+        res.status(200).json(projects);
+    } catch (error) {
+        res.status(500).json(error);
     }
 });
 
