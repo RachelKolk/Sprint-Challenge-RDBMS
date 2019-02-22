@@ -54,6 +54,8 @@ server.post('/actions', async (req, res) => {
 //GETS a project using its id and returns the project with its actions
 server.get('/projects/:id/actions', async (req, res) => {
     try {
+
+      
         const id = req.params.id
 
     
@@ -61,7 +63,7 @@ server.get('/projects/:id/actions', async (req, res) => {
         .join('actions as a', 'p.id', 'a.project_id')
         
         .select('p.id as _id___NUMBER', 'p.name as _name', 'p.description as _description', 'p.completed as _completed', 
-        'a.id as _action_id___NUMBER', 'a.description as _action_name', 'a.notes as _action_notes', 'a.completed as _action_completed')
+        'a.id as _action__id___NUMBER', 'a.description as _action__name', 'a.notes as _action__notes', 'a.completed as _action__completed')
         
         .where('a.project_id', id);
         result = NestHydrationJS.nest(entireProject);
@@ -77,8 +79,9 @@ server.get('/projects/:id/actions', async (req, res) => {
     } catch  (error) {
         res.status(500).json({message: "An error occured."});
     }
-});
 
+
+});
 
 
 //GETS all projects
